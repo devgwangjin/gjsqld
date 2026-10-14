@@ -516,7 +516,193 @@
     }
   });
 
+  // ==========================================
+  // 📘 Theory Viewer Logic (2024 핵심 이론집)
+  // ==========================================
+  const tabBtnQuiz = document.getElementById('tab-btn-quiz');
+  const tabBtnTheory = document.getElementById('tab-btn-theory');
+  const viewQuiz = document.getElementById('view-quiz');
+  const viewTheory = document.getElementById('view-theory');
+  const theorySearch = document.getElementById('theory-search');
+  const theoryFilterPills = document.querySelectorAll('.filter-pill');
+  const theoryContainer = document.getElementById('theory-container');
+
+  let currentTheorySubject = 'ALL';
+  let theorySearchQuery = '';
+
+  function switchTab(target) {
+    if (target === 'quiz') {
+      tabBtnQuiz.classList.add('active');
+      tabBtnTheory.classList.remove('active');
+      viewQuiz.classList.add('active');
+      viewTheory.classList.remove('active');
+    } else {
+      tabBtnQuiz.classList.remove('active');
+      tabBtnTheory.classList.add('active');
+      viewQuiz.classList.remove('active');
+      viewTheory.classList.add('active');
+      renderTheoryCards();
+    }
+  }
+
+  tabBtnQuiz.addEventListener('click', () => switchTab('quiz'));
+  tabBtnTheory.addEventListener('click', () => switchTab('theory'));
+
+  // Simple Markdown text formatter for theory body
+  function formatMarkdownText(text) {
+    if (!text) return '';
+    return text
+      .trim()
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;color:#0f172a;padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">$1</code>');
+  }
+
+  function renderTheoryCards() {
+    const theoryData = window.SQLD_THEORY_DATA || [];
+    theoryContainer.innerHTML = '';
+
+    const query = theorySearchQuery.toLowerCase().trim();
+
+    theoryData.forEach(chapterGroup => {
+      // Filter by subject pill
+      if (currentTheorySubject !== 'ALL' && chapterGroup.subject !== currentTheorySubject) {
+        return;
+      }
+
+      // Filter sections in this chapter
+      const matchingSections = chapterGroup.sections.filter(sec => {
+        if (!query) return true;
+        const inTitle = sec.title.toLowerCase().includes(query);
+        const inContent = sec.content.toLowerCase().includes(query);
+        const inKeywords = (sec.keywords || []).some(k => k.toLowerCase().includes(query));
+        return inTitle || inContent || inKeywords;
+      });
+
+      if (matchingSections.length === 0) return;
+
+      const block = document.createElement('div');
+      block.className = 'theory-chapter-block';
+
+      const heading = document.createElement('h2');
+      heading.className = 'chapter-heading';
+      heading.textContent = `${chapterGroup.subjectTitle} ➔ ${chapterGroup.chapterTitle}`;
+      block.appendChild(heading);
+
+      matchingSections.forEach(sec => {
+        const card = document.createElement('article');
+        card.className = 'theory-card';
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'theory-card-header';
+        
+        const title = document.createElement('h3');
+        title.className = 'theory-card-title';
+        title.textContent = sec.title;
+
+        const meta = document.createElement('div');
+        meta.className = 'theory-card-meta';
+        const pageBadge = document.createElement('span');
+        pageBadge.className = 'theory-page-badge';
+        pageBadge.textContent = sec.page;
+        meta.appendChild(pageBadge);
+
+        header.appendChild(title);
+        header.appendChild(meta);
+        card.appendChild(header);
+
+        // Body
+        const body = document.createElement('div');
+        body.className = 'theory-body';
+        body.innerHTML = formatMarkdownText(sec.content);
+        card.appendChild(body);
+
+        // Comparison Table (if exists)
+        if (sec.compareTable) {
+          const tableWrap = document.createElement('div');
+          tableWrap.className = 'theory-table-wrapper';
+          const table = document.createElement('table');
+          table.className = 'theory-table';
+
+          // thead
+          const thead = document.createElement('thead');
+          const trH = document.createElement('tr');
+          sec.compareTable.headers.forEach(h => {
+            const th = document.createElement('th');
+            th.textContent = h;
+            trH.appendChild(th);
+          });
+          thead.appendChild(trH);
+          table.appendChild(thead);
+
+          // tbody
+          const tbody = document.createElement('tbody');
+          sec.compareTable.rows.forEach(r => {
+            const tr = document.createElement('tr');
+            r.forEach(c => {
+              const td = document.createElement('td');
+              td.innerHTML = formatMarkdownText(c);
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+          table.appendChild(tbody);
+          tableWrap.appendChild(table);
+          card.appendChild(tableWrap);
+        }
+
+        // Footer action: Jump to quiz for this topic
+        const footer = document.createElement('div');
+        footer.className = 'theory-card-footer';
+        const jumpBtn = document.createElement('button');
+        jumpBtn.className = 'btn-jump-to-quiz';
+        jumpBtn.innerHTML = `<span>✏️</span> <strong>${sec.targetSubject} 기출문제 바로 풀기</strong> ➔`;
+        jumpBtn.addEventListener('click', () => {
+          // Switch to Quiz tab
+          switchTab('quiz');
+          // Filter by that subject
+          subjectFilter.value = sec.targetSubject;
+          currentSubject = sec.targetSubject;
+          currentMode = 'ROUND';
+          setActiveModeButton(btnModeAll);
+          applyFilters();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        footer.appendChild(jumpBtn);
+        card.appendChild(footer);
+
+        block.appendChild(card);
+      });
+
+      theoryContainer.appendChild(block);
+    });
+
+    if (theoryContainer.children.length === 0) {
+      theoryContainer.innerHTML = `
+        <div style="text-align:center;padding:48px 20px;background:#fff;border-radius:12px;border:1px dashed #cbd5e1;color:#64748b;">
+          <h3>검색 결과가 없습니다 🔍</h3>
+          <p style="margin-top:8px;font-size:0.9rem;">'${theorySearchQuery}'와(과) 일치하는 이론 내용이 없습니다. 다른 키워드로 검색해 보세요.</p>
+        </div>
+      `;
+    }
+  }
+
+  theorySearch.addEventListener('input', (e) => {
+    theorySearchQuery = e.target.value;
+    renderTheoryCards();
+  });
+
+  theoryFilterPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      theoryFilterPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentTheorySubject = pill.dataset.filter;
+      renderTheoryCards();
+    });
+  });
+
   // Start app
   initDropdown();
   applyFilters();
+  renderTheoryCards();
 })();

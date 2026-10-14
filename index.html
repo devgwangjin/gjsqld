@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SQLD 나만의 기출 풀이 & 오답노트</title>
+  <title>SQLD 기출 풀이 & 2024 핵심 이론집</title>
   <link rel="stylesheet" href="style.css" />
   <!-- D2Coding / Pretendard Web Fonts -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-subset.css" />
@@ -16,7 +16,7 @@
       <div class="header-left">
         <div class="logo-badge">SQLD</div>
         <div class="header-titles">
-          <h1>나만의 SQLD 기출 풀이 시스템</h1>
+          <h1>나만의 SQLD 합격 시스템</h1>
           <p class="subtitle">2024 개정판 교재 연계 &middot; 기출 900제 즉시 채점</p>
         </div>
       </div>
@@ -40,125 +40,159 @@
       </div>
     </header>
 
-    <!-- Navigation / Mode Bar -->
-    <nav class="mode-bar">
-      <div class="mode-left">
-        <label for="round-select" class="control-label">풀이 모드:</label>
-        <select id="round-select" class="dropdown">
-          <!-- Filled by JS -->
-        </select>
-        <select id="subject-filter" class="dropdown">
-          <option value="ALL">전체 과목 (50문항)</option>
-          <option value="1과목">1과목 (데이터 모델링 10문항)</option>
-          <option value="2과목">2과목 (SQL 기본 및 활용 40문항)</option>
-        </select>
-      </div>
-      <div class="mode-right">
-        <button id="btn-mode-all" class="mode-btn active">📑 전체 기출</button>
-        <button id="btn-mode-wrong" class="mode-btn">🔥 오답만 풀기</button>
-        <button id="btn-mode-starred" class="mode-btn">⭐ 헷갈린 것만</button>
-        <button id="btn-mode-random" class="mode-btn">🎲 랜덤 50제</button>
-      </div>
+    <!-- Top Level Navigation Tabs -->
+    <nav class="main-tabs-bar">
+      <button id="tab-btn-quiz" class="main-tab-btn active">
+        <span class="tab-icon">📝</span> 기출문제 풀기 (900제)
+      </button>
+      <button id="tab-btn-theory" class="main-tab-btn">
+        <span class="tab-icon">📘</span> 2024 핵심 이론집 (비교표 &amp; 요약)
+      </button>
     </nav>
 
-    <!-- Main Content Area -->
-    <main class="main-layout">
-      <!-- Left: Question & Solution Card -->
-      <section class="card-section">
-        <div class="question-card" id="question-card">
-          <!-- Question Header -->
-          <div class="q-header">
-            <div class="q-tags">
-              <span id="q-round-badge" class="badge round-badge">제45회</span>
-              <span id="q-subject-badge" class="badge subject-badge">1과목</span>
-              <span id="q-number-badge" class="badge number-badge">1번</span>
+    <!-- 1. QUIZ VIEW -->
+    <div id="view-quiz" class="tab-view active">
+      <!-- Navigation / Mode Bar -->
+      <nav class="mode-bar">
+        <div class="mode-left">
+          <label for="round-select" class="control-label">풀이 모드:</label>
+          <select id="round-select" class="dropdown">
+            <!-- Filled by JS -->
+          </select>
+          <select id="subject-filter" class="dropdown">
+            <option value="ALL">전체 과목 (50문항)</option>
+            <option value="1과목">1과목 (데이터 모델링 10문항)</option>
+            <option value="2과목">2과목 (SQL 기본 및 활용 40문항)</option>
+          </select>
+        </div>
+        <div class="mode-right">
+          <button id="btn-mode-all" class="mode-btn active">📑 전체 기출</button>
+          <button id="btn-mode-wrong" class="mode-btn">🔥 오답만 풀기</button>
+          <button id="btn-mode-starred" class="mode-btn">⭐ 헷갈린 것만</button>
+          <button id="btn-mode-random" class="mode-btn">🎲 랜덤 50제</button>
+        </div>
+      </nav>
+
+      <!-- Main Layout -->
+      <main class="main-layout">
+        <!-- Left: Question & Solution Card -->
+        <section class="card-section">
+          <div class="question-card" id="question-card">
+            <!-- Question Header -->
+            <div class="q-header">
+              <div class="q-tags">
+                <span id="q-round-badge" class="badge round-badge">제45회</span>
+                <span id="q-subject-badge" class="badge subject-badge">1과목</span>
+                <span id="q-number-badge" class="badge number-badge">1번</span>
+              </div>
+              <div class="q-actions">
+                <button id="btn-bookmark" class="icon-btn" title="헷갈리는 문제로 찜하기">
+                  <span class="star-icon">☆</span>
+                  <span class="btn-text">헷갈려요</span>
+                </button>
+              </div>
             </div>
-            <div class="q-actions">
-              <button id="btn-bookmark" class="icon-btn" title="헷갈리는 문제로 찜하기">
-                <span class="star-icon">☆</span>
-                <span class="btn-text">헷갈려요</span>
+
+            <!-- Question Title -->
+            <h2 id="q-title" class="q-title">데이터를 불러오는 중입니다...</h2>
+
+            <!-- References / Attachments (SQL, Table, Passage) -->
+            <div id="q-reference-box" class="reference-box hidden">
+              <!-- Rendered by JS -->
+            </div>
+
+            <!-- Options (1, 2, 3, 4) -->
+            <div class="options-container" id="options-container">
+              <!-- Buttons filled by JS -->
+            </div>
+
+            <!-- Solution & Explanation Panel -->
+            <div id="solution-panel" class="solution-panel hidden">
+              <div class="solution-header" id="solution-header">
+                <span class="result-badge" id="result-badge">정답입니다! 🎉</span>
+                <span class="correct-answer-text">정답: <strong id="correct-ans-num">1번</strong></span>
+              </div>
+
+              <!-- Official Explanation -->
+              <div class="explanation-box">
+                <h3 class="exp-title">💡 핵심 출제 해설</h3>
+                <p id="q-explanation" class="exp-content"></p>
+              </div>
+
+              <!-- 2024 Concept Book Note -->
+              <div id="concept-note-box" class="concept-note-box hidden">
+                <div class="concept-header">
+                  <span class="concept-icon">📘</span>
+                  <span class="concept-title" id="concept-title">2024 개정 교재 연계 핵심 요약</span>
+                  <span class="concept-ref" id="concept-ref"></span>
+                </div>
+                <div id="concept-summary" class="concept-summary"></div>
+              </div>
+            </div>
+
+            <!-- Card Navigation Bottom Bar -->
+            <div class="card-footer">
+              <button id="btn-prev" class="nav-btn">
+                <span class="arrow">◀</span> 이전 문제 <span class="shortcut-hint">(←)</span>
+              </button>
+              <div class="footer-center">
+                <span id="q-progress-text">1 / 50</span>
+                <button id="btn-reset-current" class="text-btn">다시 풀기</button>
+              </div>
+              <button id="btn-next" class="nav-btn primary">
+                다음 문제 <span class="arrow">▶</span> <span class="shortcut-hint">(Enter, →)</span>
               </button>
             </div>
           </div>
+        </section>
 
-          <!-- Question Title -->
-          <h2 id="q-title" class="q-title">데이터를 불러오는 중입니다...</h2>
-
-          <!-- References / Attachments (SQL, Table, Passage) -->
-          <div id="q-reference-box" class="reference-box hidden">
-            <!-- Rendered by JS -->
-          </div>
-
-          <!-- Options (1, 2, 3, 4) -->
-          <div class="options-container" id="options-container">
-            <!-- Buttons filled by JS -->
-          </div>
-
-          <!-- Solution & Explanation Panel (Appears after answer) -->
-          <div id="solution-panel" class="solution-panel hidden">
-            <div class="solution-header" id="solution-header">
-              <span class="result-badge" id="result-badge">정답입니다! 🎉</span>
-              <span class="correct-answer-text">정답: <strong id="correct-ans-num">1번</strong></span>
+        <!-- Right: Question Number Grid & Overview -->
+        <aside class="sidebar-section">
+          <div class="sidebar-card">
+            <div class="sidebar-header">
+              <h3>문항 진도표</h3>
+              <span id="grid-status-count" class="grid-status">0/50 완료</span>
             </div>
-
-            <!-- Official Explanation -->
-            <div class="explanation-box">
-              <h3 class="exp-title">💡 핵심 출제 해설</h3>
-              <p id="q-explanation" class="exp-content"></p>
+            <div class="legend-bar">
+              <span class="legend-item"><span class="dot correct"></span> 맞음</span>
+              <span class="legend-item"><span class="dot wrong"></span> 틀림</span>
+              <span class="legend-item"><span class="dot starred"></span> 헷갈림</span>
             </div>
-
-            <!-- 2024 Concept Book Note (If matched) -->
-            <div id="concept-note-box" class="concept-note-box hidden">
-              <div class="concept-header">
-                <span class="concept-icon">📘</span>
-                <span class="concept-title" id="concept-title">2024 개정 교재 연계 핵심 요약</span>
-                <span class="concept-ref" id="concept-ref"></span>
-              </div>
-              <div id="concept-summary" class="concept-summary"></div>
+            <div class="number-grid" id="number-grid">
+              <!-- 1 to 50 numbered pills -->
+            </div>
+            <div class="sidebar-footer">
+              <button id="btn-clear-round-records" class="btn-subtle">이 회차 풀이 기록 초기화</button>
             </div>
           </div>
+        </aside>
+      </main>
+    </div>
 
-          <!-- Card Navigation Bottom Bar -->
-          <div class="card-footer">
-            <button id="btn-prev" class="nav-btn">
-              <span class="arrow">◀</span> 이전 문제 <span class="shortcut-hint">(←)</span>
-            </button>
-            <div class="footer-center">
-              <span id="q-progress-text">1 / 50</span>
-              <button id="btn-reset-current" class="text-btn">다시 풀기</button>
-            </div>
-            <button id="btn-next" class="nav-btn primary">
-              다음 문제 <span class="arrow">▶</span> <span class="shortcut-hint">(Enter, →)</span>
-            </button>
-          </div>
+    <!-- 2. THEORY VIEW -->
+    <div id="view-theory" class="tab-view">
+      <div class="theory-control-bar">
+        <div class="theory-search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="theory-search" placeholder="이론 개념 검색 (예: 정규화, RANK, 식별자, NULL, ROLLUP...)" />
         </div>
-      </section>
-
-      <!-- Right: Question Number Grid & Overview -->
-      <aside class="sidebar-section">
-        <div class="sidebar-card">
-          <div class="sidebar-header">
-            <h3>문항 진도표</h3>
-            <span id="grid-status-count" class="grid-status">0/50 완료</span>
-          </div>
-          <div class="legend-bar">
-            <span class="legend-item"><span class="dot correct"></span> 맞음</span>
-            <span class="legend-item"><span class="dot wrong"></span> 틀림</span>
-            <span class="legend-item"><span class="dot starred"></span> 헷갈림</span>
-          </div>
-          <div class="number-grid" id="number-grid">
-            <!-- 1 to 50 numbered pills -->
-          </div>
-          <div class="sidebar-footer">
-            <button id="btn-clear-round-records" class="btn-subtle">이 회차 풀이 기록 초기화</button>
-          </div>
+        <div class="theory-filter-pills">
+          <button class="filter-pill active" data-filter="ALL">전체 단원 보기</button>
+          <button class="filter-pill" data-filter="1과목">제1과목: 데이터 모델링</button>
+          <button class="filter-pill" data-filter="2과목">제2과목: SQL 기본 및 활용</button>
         </div>
-      </aside>
-    </main>
+      </div>
+
+      <!-- Theory Content Container -->
+      <div id="theory-container" class="theory-cards-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
   </div>
 
-  <!-- Load Data First -->
+  <!-- Load Data Files First -->
   <script src="questions_data.js"></script>
+  <script src="theory_data.js"></script>
   <!-- Load App Logic -->
   <script src="app.js"></script>
 </body>
